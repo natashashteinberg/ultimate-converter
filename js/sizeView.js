@@ -18,6 +18,8 @@ export function mountTableView(root, tables, storeKey) {
   const saved = store.get(storeKey, {});
   tSel.innerHTML = tables.map((t) => `<option value="${t.id}">${t.label_he}</option>`).join('');
   if (tables.some((t) => t.id === saved.t)) tSel.value = saved.t;
+  // בשאילתה עם טבלה אחת אין מה לבחור, ולכן שדה "סוג" מוסתר.
+  if (tables.length === 1) tSel.closest('label').hidden = true;
 
   const table = () => tables.find((t) => t.id === tSel.value);
 

@@ -1,10 +1,16 @@
 import { parseNumber } from './lib/num.js';
 
 export function bdi(text) {
+  // bdi בלי כיוון קבוע: הדפדפן בוחר לפי האות החזקה הראשונה. מספרים וסימני מטבע נשארים משמאל לימין,
+  // וטקסט שמתחיל בעברית (תאריכים, "5 שבועות") מוצג מימין לשמאל ולא הפוך.
   const b = document.createElement('bdi');
-  b.dir = 'ltr';
   b.textContent = text;
   return b;
+}
+
+// כותרת בולטת והסבר קצר לכל שאילתה במסך. המחרוזות סטטיות, בלי קלט של משתמש.
+export function head(title, help = '') {
+  return `<h2 class="sec-title">${title}</h2>${help ? `<p class="sec-help">${help}</p>` : ''}`;
 }
 
 export function readNum(input) {

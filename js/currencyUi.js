@@ -35,6 +35,18 @@ export function currencyOptions(codes, favorites, selected, query = '') {
     + `<optgroup label="כל המטבעות">${rest.map((c) => opt(c, selected)).join('')}</optgroup>`;
 }
 
+// פריטים לבורר המטבעות: מועדפים קודם, ואז כל השאר. החיפוש מכיר קוד, שם בעברית, שם באנגלית וכינויים.
+export function currencyItems(codes, favorites) {
+  const item = (code, group) => ({
+    value: code,
+    label: currencyLabel(code),
+    search: `${nameOf(code, he)} ${nameOf(code, en)} ${ALIASES[code] ?? ''}`,
+    group,
+  });
+  const favs = favorites.filter((c) => codes.includes(c));
+  return [...favs.map((c) => item(c, 'מועדפים')), ...codes.filter((c) => !favs.includes(c)).map((c) => item(c, 'כל המטבעות'))];
+}
+
 export function formatAmount(n) {
   if (!Number.isFinite(n)) return '';
   const digits = Math.abs(n) < 1 && n !== 0 ? 4 : 2;

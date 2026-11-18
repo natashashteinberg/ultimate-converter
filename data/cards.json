@@ -1,0 +1,54 @@
+{
+  "verifiedAt": "2026-11-18",
+  "note_he": "עמלת ההמרה שחברות האשראי גובות על קנייה במטבע זר, כפי שמופיעה בדפים ובתעריפונים הרשמיים שלהן. העמלה תלויה בדגם הכרטיס, בבנק המנפיק ובהסדרים מיוחדים (למשל הנחות במסלולים או במועדונים), ולכן אם הכרטיס שלך שונה, אפשר להזין עמלה ידנית. העמלות משתנות, ולכן כדאי לבדוק בתעריפון העדכני של הכרטיס שלך.",
+  "cards": [
+    {
+      "id": "isracard_basic",
+      "name_he": "ישראכרט BASIC",
+      "issuer_he": "ישראכרט",
+      "feePct": 0,
+      "note_he": "פטור מלא מעמלת מט\"ח בקניות בחו\"ל ואונליין, לא כולל משיכת מזומן.",
+      "source": "https://www.isracard.co.il/blog/abroad/exchange-fee/private"
+    },
+    {
+      "id": "cal_alibuy",
+      "name_he": "כאל AliBuy",
+      "issuer_he": "כאל",
+      "feePct": 1,
+      "note_he": "עמלה מוזלת של 1% במקום 3% בעסקאות בחו\"ל וברכישות מאתרים בינלאומיים.",
+      "source": "https://www.cal-online.co.il/cards/alibuy/"
+    },
+    {
+      "id": "isracard_mizrahi",
+      "name_he": "ישראכרט (תעריפון בנק מזרחי)",
+      "issuer_he": "ישראכרט",
+      "feePct": 2.7,
+      "note_he": "לפי התעריפון של 2025 לכרטיסי ישראכרט דרך בנק מזרחי. בכרטיסים אחרים של ישראכרט ייתכן שיעור שונה.",
+      "source": "https://digital.isracard.co.il/globalassets/taarifon_files/2025/mizrachi25more.pdf"
+    },
+    {
+      "id": "max_general",
+      "name_he": "מקס (תעריפון כללי)",
+      "issuer_he": "מקס",
+      "feePct": 3,
+      "note_he": "התעריפון הכללי של מקס, כולל עסקאות בארץ ובחו\"ל במטבע זר. במסלולים מסוימים יש הנחה.",
+      "source": "https://www.max.co.il/api/umbraco/getImage?imageName=taarifon_general.pdf"
+    },
+    {
+      "id": "cal_general",
+      "name_he": "כאל (תעריף רגיל)",
+      "issuer_he": "כאל",
+      "feePct": 3,
+      "note_he": "התעריף הרגיל של כאל, כפי שמצוין בדף של כרטיס AliBuy (\"1% במקום 3%\").",
+      "source": "https://www.cal-online.co.il/cards/alibuy/"
+    },
+    {
+      "id": "diners",
+      "name_he": "דיינרס",
+      "issuer_he": "דיינרס",
+      "feePct": 3,
+      "note_he": "עמלה של 3.0% בחיוב חשבון שקלי. בחשבון דולרי עסקאות בדולר מחויבות בלי המרה ובלי עמלה.",
+      "source": "https://www.diners.co.il/more/hiyuv-diners/"
+    }
+  ]
+}

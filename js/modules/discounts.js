@@ -1,6 +1,6 @@
 import { applyDiscounts, whatPercent } from '../lib/percent.js';
 import { formatMoney } from '../lib/num.js';
-import { readNum, onInput, showLines } from '../ui.js';
+import { head, readNum, onInput, showLines } from '../ui.js';
 
 export default {
   id: 'discounts',
@@ -10,7 +10,8 @@ export default {
   render(container) {
     container.innerHTML = `
       <div class="card">
-        <label class="field"><span>מחיר מקורי</span><input id="d-price" type="text" inputmode="decimal" autocomplete="off" placeholder="0"></label>
+        ${head('כמה עולה אחרי ההנחה?', 'מזינים את המחיר המקורי ואת אחוז ההנחה (אפשר גם הנחה שנייה, כמו "עוד 10% בקופה"), ורואים את המחיר הסופי ואת החיסכון. למשל: 100 עם הנחה של 20% ועוד 10% הם 72.')}
+        <label class="field"><span>המחיר המקורי</span><input id="d-price" type="text" inputmode="decimal" autocomplete="off" placeholder="למשל 100"></label>
         <div class="two">
           <label class="field"><span>הנחה ראשונה (%)</span><input id="d-1" type="text" inputmode="decimal" autocomplete="off"></label>
           <label class="field"><span>הנחה שנייה (%)</span><input id="d-2" type="text" inputmode="decimal" autocomplete="off"></label>

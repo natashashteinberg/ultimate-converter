@@ -1,6 +1,6 @@
 // Service worker של מחשבון המרות אולטימטיבי.
 // כל שחרור שמשנה קובץ באפליקציה חייב להעלות את CACHE_VERSION, אחרת מכשירים ימשיכו להציג את הגרסה הישנה.
-const CACHE_VERSION = 'v1';
+const CACHE_VERSION = 'v2';
 const CACHE = `converter-${CACHE_VERSION}`;
 
 const PRECACHE = [
@@ -10,17 +10,21 @@ const PRECACHE = [
   'css/app.css',
   'js/app.js',
   'js/currencyUi.js',
+  'js/picker.js',
+  'js/simpleConverter.js',
   'js/rates.js',
   'js/registry.js',
   'js/sizeView.js',
   'js/taxData.js',
   'js/ui.js',
+  'js/lib/cards.js',
   'js/lib/dates.js',
   'js/lib/fuel.js',
   'js/lib/kitchen.js',
   'js/lib/money.js',
   'js/lib/num.js',
   'js/lib/percent.js',
+  'js/lib/search.js',
   'js/lib/sizes.js',
   'js/lib/store.js',
   'js/lib/timezones.js',
@@ -34,14 +38,18 @@ const PRECACHE = [
   'js/modules/discounts.js',
   'js/modules/fuel.js',
   'js/modules/kitchen.js',
+  'js/modules/percent.js',
   'js/modules/shopsizes.js',
   'js/modules/sizes.js',
+  'js/modules/temperature.js',
+  'js/modules/time.js',
   'js/modules/timezones.js',
   'js/modules/tip.js',
   'js/modules/unitprice.js',
   'js/modules/units.js',
   'js/modules/ustax.js',
   'js/modules/vat.js',
+  'data/cards.json',
   'data/cities.json',
   'data/cooking.json',
   'data/rates-snapshot.json',

@@ -2,39 +2,39 @@ import { mountTableView } from '../sizeView.js';
 import { tvDimensions } from '../lib/sizes.js';
 import { convert } from '../lib/units.js';
 import { parseNumber } from '../lib/num.js';
-import { showLines } from '../ui.js';
+import { store } from '../lib/store.js';
+import { head, showLines } from '../ui.js';
 
-const KINDS = [['bra', 'חזיות'], ['ring', 'טבעות'], ['mattress', 'מזרנים'], ['tv', 'טלוויזיות']];
 const n1 = (n) => (Number.isFinite(n) ? String(Number(n.toFixed(1))) : '');
 
 export default {
   id: 'shopsizes',
-  title: 'מידות לקניות בארה"ב',
+  title: 'מידות לקניות',
   group: 'travel',
   icon: 'ruler',
   render(container) {
     container.innerHTML = `
-      <div class="card">
-        <label class="field"><span>מה קונים?</span><select id="k-kind">${KINDS.map(([id, l]) => `<option value="${id}">${l}</option>`).join('')}</select></label>
-        <div id="k-bra"></div>
-        <div id="k-ring" hidden></div>
-        <div id="k-mattress" hidden></div>
-        <div id="k-tv" hidden>
-          <div class="two">
-            <label class="field"><span>אינץ' (אלכסון)</span><input id="tv-in" type="text" inputmode="decimal" autocomplete="off" placeholder="55"></label>
-            <label class="field"><span>סנטימטרים</span><input id="tv-cm" type="text" inputmode="decimal" autocomplete="off"></label>
-          </div>
-          <div class="lines" id="tv-out" aria-live="polite"></div>
-          <div class="note">מידות הגוף של מסך ביחס 16:9, בלי המסגרת והרגליים.</div>
+      <div class="card" id="r-card">
+        ${head('טבעות', 'בוחרים באיזו מערכת יש לך מידה (למשל ארה"ב), ואת המידה עצמה, ורואים את המידה המקבילה בשאר המערכות. למשל: מידה 7 בארה"ב היא היקף של 54.4 מ"מ.')}
+        <div class="r-mount">טוען…</div>
+      </div>
+      <div class="card" id="m-card">
+        ${head('מזרנים', 'בוחרים גודל מזרן לפי השם שלו (למשל Queen), ורואים את המידות בסנטימטרים ובאינצ\'ים.')}
+        <div class="chips cats" id="m-chips" role="radiogroup" aria-label="גודל מזרן"></div>
+        <div class="lines" id="m-out" aria-live="polite"></div>
+      </div>
+      <div class="card" id="t-card">
+        ${head('טלוויזיות', 'מקלידים את גודל המסך באינצ\'ים (האלכסון) או בסנטימטרים, ורואים גם כמה רחב וגבוה המסך. למשל: טלוויזיה של 55 אינץ\' היא רחבה כ-122 ס"מ.')}
+        <div class="two">
+          <label class="field"><span>אינץ' (אלכסון)</span><input id="tv-in" type="text" inputmode="decimal" autocomplete="off" placeholder="למשל 55"></label>
+          <label class="field"><span>סנטימטרים</span><input id="tv-cm" type="text" inputmode="decimal" autocomplete="off" placeholder="למשל 140"></label>
         </div>
-        <div class="note" id="k-note"></div>
-      </div>`;
+        <div class="lines" id="tv-out" aria-live="polite"></div>
+        <div class="note">מידות הגוף של מסך ביחס 16:9, בלי המסגרת והרגליים.</div>
+      </div>
+      <div class="note" id="k-note" style="margin-top:24px"></div>`;
 
     const $ = (s) => container.querySelector(s);
-    const kind = $('#k-kind');
-    const panels = Object.fromEntries(KINDS.map(([id]) => [id, $(`#k-${id}`)]));
-    const show = () => { for (const [id, el] of Object.entries(panels)) el.hidden = id !== kind.value; };
-    kind.addEventListener('change', show);
 
     // טלוויזיה
     const tvIn = $('#tv-in'), tvCm = $('#tv-cm'), tvOut = $('#tv-out');
@@ -56,21 +56,38 @@ export default {
     });
 
     fetch('data/sizes.json').then((r) => r.json()).then((d) => {
-      mountTableView(panels.bra, [d.tables.find((t) => t.id === 'bra')], 'bra_last');
-      mountTableView(panels.ring, [d.tables.find((t) => t.id === 'ring')], 'ring_last');
-      panels.mattress.replaceChildren(...d.mattress.map((m) => {
-        const row = document.createElement('div');
-        row.className = 'guide-row';
-        const h = document.createElement('div');
-        h.className = 'guide-h';
-        h.textContent = m.he;
-        const t = document.createElement('div');
-        t.textContent = `${m.cm_w} × ${m.cm_l} ס"מ (${m.in_w} × ${m.in_l} אינץ')`;
-        row.append(h, t);
-        return row;
+      mountTableView($('#r-card .r-mount'), [d.tables.find((t) => t.id === 'ring')], 'ring_last');
+
+      // מזרנים: בוחרים לפי שם ורואים סנטימטרים ואינצ'ים.
+      const chips = $('#m-chips'), out = $('#m-out');
+      let current = store.get('mattress_last', 'queen');
+      if (!d.mattress.some((m) => m.id === current)) current = 'queen';
+      chips.replaceChildren(...d.mattress.map((m) => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.dataset.id = m.id;
+        b.textContent = m.he;
+        b.setAttribute('role', 'radio');
+        return b;
       }));
-      $('#k-note').textContent = `${d.note_he} בחזיות מוצג רק היקף החזייה, וגודל הכוסית משתנה בין מדינות. נבדק ב-${d.verifiedAt}. מקור: ויקיפדיה.`;
+      function showMattress() {
+        store.set('mattress_last', current);
+        const m = d.mattress.find((x) => x.id === current);
+        for (const b of chips.children) {
+          b.classList.toggle('on', b.dataset.id === current);
+          b.setAttribute('aria-checked', String(b.dataset.id === current));
+        }
+        showLines(out, [['בסנטימטרים (רוחב × אורך)', `${m.cm_w} × ${m.cm_l}`], ['באינצ\'ים (רוחב × אורך)', `${m.in_w} × ${m.in_l}`]]);
+      }
+      chips.addEventListener('click', (e) => {
+        const b = e.target.closest('button[data-id]');
+        if (!b) return;
+        current = b.dataset.id;
+        showMattress();
+      });
+      showMattress();
+
+      $('#k-note').textContent = `${d.note_he} נבדק ב-${d.verifiedAt}. מקור: ויקיפדיה. גדלי המזרנים הם הסטנדרט בצפון אמריקה.`;
     }).catch(() => { $('#k-note').textContent = 'הטבלאות אינן זמינות כרגע.'; });
-    show();
   },
 };

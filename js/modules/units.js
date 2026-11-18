@@ -1,8 +1,12 @@
 import { categories, convert, ftInToCm, cmToFtIn } from '../lib/units.js';
 import { parseNumber } from '../lib/num.js';
 import { store } from '../lib/store.js';
+import { head } from '../ui.js';
 
 const KEY = 'units_last';
+// טמפרטורה וזמן הן קטגוריות נפרדות במסך הראשי.
+const SEPARATE = new Set(['temperature', 'time']);
+const SHOWN = Object.entries(categories).filter(([id]) => !SEPARATE.has(id));
 const DEFAULTS = {
   length: ['in', 'cm'], weight: ['lb', 'kg'], volume: ['gal_us', 'l'], area: ['ft2', 'm2'],
   temperature: ['f', 'c'], speed: ['mph', 'kmh'], energy: ['kcal', 'kj'], pressure: ['psi', 'bar'],
@@ -26,28 +30,29 @@ export default {
   icon: 'ruler',
   render(container) {
     const saved = store.get(KEY, {});
-    let cat = categories[saved.cat] ? saved.cat : 'length';
+    let cat = categories[saved.cat] && !SEPARATE.has(saved.cat) ? saved.cat : 'length';
 
     container.innerHTML = `
       <div class="card">
-        <label class="field"><span>סוג</span>
-          <select id="u-cat">${Object.entries(categories).map(([id, c]) => `<option value="${id}"${id === cat ? ' selected' : ''}>${c.label}</option>`).join('')}</select>
+        ${head('המרת מידות', 'בוחרים מה ממירים (אורך, משקל, נפח ועוד), מזינים ערך, ובוחרים מאיזו יחידה לאיזו. למשל: 10 אינץ\' הם 25.4 ס"מ.')}
+        <label class="field"><span>מה ממירים?</span>
+          <select id="u-cat">${SHOWN.map(([id, c]) => `<option value="${id}"${id === cat ? ' selected' : ''}>${c.label}</option>`).join('')}</select>
         </label>
-        <label class="field"><span>ערך</span>
-          <input id="u-val" type="text" inputmode="decimal" autocomplete="off" placeholder="0">
+        <label class="field"><span>הערך שרוצים להמיר</span>
+          <input id="u-val" type="text" inputmode="decimal" autocomplete="off" placeholder="למשל 10">
         </label>
         <label class="field"><span>מ-</span><select id="u-from"></select></label>
         <button class="swap" id="u-swap" type="button" aria-label="החלפת כיוון"><i class="ph-duotone ph-arrows-down-up" aria-hidden="true"></i></button>
         <label class="field"><span>ל-</span><select id="u-to"></select></label>
         <div class="result" id="u-res" aria-live="polite"></div>
       </div>
-      <div class="card" id="u-height" style="margin-top:12px" hidden>
-        <div class="note" style="margin-bottom:10px">גובה: רגל ואינץ\' וסנטימטרים</div>
+      <div class="card" id="u-height" hidden>
+        ${head('גובה: רגל ואינץ\' וסנטימטרים', 'בארה"ב מודדים גובה ברגל ובאינץ\'. מקלידים באחד הצדדים והשני מתעדכן. למשל: 5 רגל ו-10 אינץ\' הם 177.8 ס"מ.')}
         <div class="two">
-          <label class="field"><span>רגל</span><input id="h-ft" type="text" inputmode="decimal" autocomplete="off"></label>
-          <label class="field"><span>אינץ\'</span><input id="h-in" type="text" inputmode="decimal" autocomplete="off"></label>
+          <label class="field"><span>רגל</span><input id="h-ft" type="text" inputmode="decimal" autocomplete="off" placeholder="למשל 5"></label>
+          <label class="field"><span>אינץ\'</span><input id="h-in" type="text" inputmode="decimal" autocomplete="off" placeholder="למשל 10"></label>
         </div>
-        <label class="field"><span>סנטימטרים</span><input id="h-cm" type="text" inputmode="decimal" autocomplete="off"></label>
+        <label class="field"><span>סנטימטרים</span><input id="h-cm" type="text" inputmode="decimal" autocomplete="off" placeholder="למשל 177.8"></label>
       </div>`;
 
     const $ = (id) => container.querySelector(id);

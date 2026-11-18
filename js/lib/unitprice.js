@@ -1,5 +1,11 @@
 import { categories, toBase } from './units.js';
 
+// בכמה אחוזים המוצר הזול זול מהיקר, מעוגל למספר שלם. מחיר "זול" גבוה מ"יקר" נחשב קלט לא תקין.
+export function percentCheaper(cheap, expensive) {
+  if (!(expensive > 0) || !(cheap >= 0) || cheap > expensive) return NaN;
+  return Math.round((expensive - cheap) / expensive * 100);
+}
+
 function dimensionOf(unit) {
   if (unit === 'each') return { dim: 'each', base: 'each' };
   if (categories.weight.units[unit]) return { dim: 'weight', base: 'g' };

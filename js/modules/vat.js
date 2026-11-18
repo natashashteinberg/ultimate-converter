@@ -1,50 +1,25 @@
-import { addVat, removeVat, percentOf, whatPercent, percentChange } from '../lib/percent.js';
+import { addVat, removeVat } from '../lib/percent.js';
 import { formatMoney } from '../lib/num.js';
 import { store } from '../lib/store.js';
-import { readNum, onInput, showLines } from '../ui.js';
-
-const num = (n) => Number(n.toPrecision(10)).toLocaleString('en-US', { maximumFractionDigits: 4 });
+import { head, readNum, onInput, showLines } from '../ui.js';
 
 export default {
   id: 'vat',
-  title: 'מע"מ ואחוזים',
+  title: 'מע"מ',
   group: 'money',
-  icon: 'percent',
+  icon: 'invoice',
   render(container) {
     container.innerHTML = `
       <div class="card">
+        ${head('חישוב מע"מ', 'בוחרים אם יש לך סכום לפני מע"מ ורוצים להוסיף אותו, או סכום כולל מע"מ ורוצים לדעת כמה היה לפניו וכמה מע"מ שולם. למשל: 100 לפני מע"מ הם 118 כולל מע"מ.')}
         <div class="seg" role="radiogroup" aria-label="סוג חישוב">
-          <label><input type="radio" name="vm" value="add" checked><span>הוספת מע"מ</span></label>
-          <label><input type="radio" name="vm" value="remove"><span>הסרת מע"מ</span></label>
+          <label><input type="radio" name="vm" value="add" checked><span>להוסיף מע"מ</span></label>
+          <label><input type="radio" name="vm" value="remove"><span>להסיר מע"מ</span></label>
         </div>
-        <label class="field"><span id="v-amount-l">סכום לפני מע"מ</span><input id="v-amount" type="text" inputmode="decimal" autocomplete="off" placeholder="0"></label>
-        <label class="field"><span>שיעור מע"מ באחוזים</span><input id="v-rate" type="text" inputmode="decimal" autocomplete="off"></label>
+        <label class="field"><span id="v-amount-l">הסכום לפני מע"מ</span><input id="v-amount" type="text" inputmode="decimal" autocomplete="off" placeholder="למשל 100"></label>
+        <label class="field"><span>שיעור המע"מ (באחוזים)</span><input id="v-rate" type="text" inputmode="decimal" autocomplete="off"></label>
         <div class="lines" id="v-res" aria-live="polite"></div>
         <div class="note">שיעור המע"מ הנוכחי בישראל הוא 18% (נכון ל-2026). אפשר לשנות.</div>
-      </div>
-      <div class="card" style="margin-top:12px">
-        <div class="note" style="margin-bottom:10px">כמה זה X אחוז מ-Y</div>
-        <div class="two">
-          <label class="field"><span>אחוז</span><input id="p1a" type="text" inputmode="decimal" autocomplete="off"></label>
-          <label class="field"><span>מתוך</span><input id="p1b" type="text" inputmode="decimal" autocomplete="off"></label>
-        </div>
-        <div class="lines" id="p1r" aria-live="polite"></div>
-      </div>
-      <div class="card" style="margin-top:12px">
-        <div class="note" style="margin-bottom:10px">X הוא כמה אחוז מ-Y</div>
-        <div class="two">
-          <label class="field"><span>X</span><input id="p2a" type="text" inputmode="decimal" autocomplete="off"></label>
-          <label class="field"><span>Y</span><input id="p2b" type="text" inputmode="decimal" autocomplete="off"></label>
-        </div>
-        <div class="lines" id="p2r" aria-live="polite"></div>
-      </div>
-      <div class="card" style="margin-top:12px">
-        <div class="note" style="margin-bottom:10px">שינוי באחוזים</div>
-        <div class="two">
-          <label class="field"><span>מ-</span><input id="p3a" type="text" inputmode="decimal" autocomplete="off"></label>
-          <label class="field"><span>ל-</span><input id="p3b" type="text" inputmode="decimal" autocomplete="off"></label>
-        </div>
-        <div class="lines" id="p3r" aria-live="polite"></div>
       </div>`;
 
     const $ = (s) => container.querySelector(s);
@@ -54,7 +29,7 @@ export default {
 
     function vat() {
       const mode = radios.find((r) => r.checked).value;
-      label.textContent = mode === 'add' ? 'סכום לפני מע"מ' : 'סכום כולל מע"מ';
+      label.textContent = mode === 'add' ? 'הסכום לפני מע"מ' : 'הסכום כולל מע"מ';
       store.set('vat_rate', readNum(rate) ?? 18);
       const a = readNum(amount), r = readNum(rate);
       if (a === null || r === null || a < 0 || r < 0) { res.replaceChildren(); return; }
@@ -68,18 +43,5 @@ export default {
     }
     onInput([amount, rate], vat);
     radios.forEach((r) => r.addEventListener('change', vat));
-
-    function pair(a, b, out, fn, label, suffix = '') {
-      const calc = () => {
-        const x = readNum(a), y = readNum(b);
-        const v = x === null || y === null ? NaN : fn(x, y);
-        if (!Number.isFinite(v)) { out.replaceChildren(); return; }
-        showLines(out, [[label, num(v) + suffix]]);
-      };
-      onInput([a, b], calc);
-    }
-    pair($('#p1a'), $('#p1b'), $('#p1r'), percentOf, 'התוצאה');
-    pair($('#p2a'), $('#p2b'), $('#p2r'), whatPercent, 'אחוז', '%');
-    pair($('#p3a'), $('#p3b'), $('#p3r'), percentChange, 'שינוי', '%');
   },
 };

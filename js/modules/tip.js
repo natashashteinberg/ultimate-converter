@@ -1,7 +1,7 @@
 import { calcTip } from '../lib/tip.js';
 import { formatMoney } from '../lib/num.js';
 import { store } from '../lib/store.js';
-import { readNum, onInput, showLines } from '../ui.js';
+import { head, readNum, onInput, showLines } from '../ui.js';
 
 const KEY = 'tip_last';
 
@@ -14,8 +14,9 @@ export default {
     const saved = store.get(KEY, { basis: 'pre', pct: '18', people: '1' });
     container.innerHTML = `
       <div class="card">
-        <label class="field"><span>חשבון לפני מס ($)</span><input id="t-bill" type="text" inputmode="decimal" autocomplete="off" placeholder="0"></label>
-        <label class="field"><span>מס ($, לא חובה)</span><input id="t-tax" type="text" inputmode="decimal" autocomplete="off" placeholder="0"></label>
+        ${head('כמה טיפ להשאיר, וכמה כל אחד משלם?', 'מזינים את החשבון במסעדה, בוחרים אחוז טיפ ומספר אנשים, ורואים את הטיפ, הסכום הכולל והסכום לכל אחד. בארה"ב מקובל לחשב טיפ על הסכום לפני מס. למשל: חשבון של 100$ עם טיפ של 20% הוא 120$.')}
+        <label class="field"><span>החשבון לפני מס ($)</span><input id="t-bill" type="text" inputmode="decimal" autocomplete="off" placeholder="למשל 100"></label>
+        <label class="field"><span>המס ($, לא חובה)</span><input id="t-tax" type="text" inputmode="decimal" autocomplete="off" placeholder="למשל 8"></label>
         <div class="seg" role="radiogroup" aria-label="על מה מחשבים טיפ">
           <label><input type="radio" name="tb" value="pre"><span>טיפ לפני מס</span></label>
           <label><input type="radio" name="tb" value="post"><span>טיפ אחרי מס</span></label>
@@ -30,8 +31,8 @@ export default {
         <div class="lines" id="t-res" aria-live="polite"></div>
         <div class="note" id="t-note"></div>
       </div>
-      <div class="card" style="margin-top:12px">
-        <div class="note" style="margin-bottom:8px">מדריך טיפים בארה"ב</div>
+      <div class="card">
+        ${head('מדריך טיפים בארה"ב', 'כמה מקובל להשאיר בכל סוג מקום: מסעדה, בר, מלון, מספרה ועוד.')}
         <div id="t-guide"></div>
         <div class="note" id="t-guide-src"></div>
       </div>`;

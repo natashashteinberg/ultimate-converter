@@ -42,6 +42,13 @@ export const categories = {
     label: 'מהירות',
     units: { kmh: lin('קמ"ש', 1), mph: lin('מייל לשעה', 1.609344), ms: lin('מטר לשנייה', 3.6) },
   },
+  time: {
+    label: 'זמן',
+    units: {
+      s: lin('שניות', 1), min: lin('דקות', 60), h: lin('שעות', 3600), d: lin('ימים', 86400),
+      wk: lin('שבועות', 604800), mo: lin('חודשים (ממוצע)', 2629800), yr: lin('שנים (ממוצע)', 31557600),
+    },
+  },
   data: {
     label: 'נתונים',
     units: { b: lin('בייט', 1), kb: lin('KB', 1e3), mb: lin('MB', 1e6), gb: lin('GB', 1e9), tb: lin('TB', 1e12) },

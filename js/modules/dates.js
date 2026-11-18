@@ -1,7 +1,7 @@
-import { gregorianToHebrew, hebrewMonthsOfYear, hebrewToGregorian, hebrewYearOf, daysBetween } from '../lib/dates.js';
+import { gregorianToHebrew, hebrewMonthsOfYear, hebrewToGregorian, hebrewYearOf, daysBetween, countdownText, weeksAndDaysText, monthsAndDaysText } from '../lib/dates.js';
 import { parseNumber } from '../lib/num.js';
 import { store } from '../lib/store.js';
-import { showLines } from '../ui.js';
+import { head, showLines } from '../ui.js';
 
 const KEY = 'countdown';
 const LONG = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
@@ -16,13 +16,6 @@ function today() {
   return new Date(n.getFullYear(), n.getMonth(), n.getDate(), 12);
 }
 
-function daysText(n) {
-  const a = Math.abs(n);
-  if (a === 0) return 'היום';
-  if (a === 1) return n > 0 ? 'מחר' : 'אתמול';
-  return n > 0 ? `בעוד ${a} ימים` : `לפני ${a} ימים`;
-}
-
 export default {
   id: 'dates',
   title: 'תאריכים',
@@ -31,13 +24,14 @@ export default {
   render(container) {
     container.innerHTML = `
       <div class="card">
-        <div class="note" style="margin-bottom:10px">ספירה לאחור</div>
-        <label class="field"><span>שם (למשל: הטיסה)</span><input id="d-label" type="text" autocomplete="off"></label>
-        <label class="field"><span>תאריך</span><input id="d-target" type="date"></label>
-        <div class="lines" id="d-count" aria-live="polite"></div>
+        ${head('כמה ימים עד לאירוע?', 'מזינים מה האירוע ומתי הוא, ורואים כמה ימים נשארו. למשל: טיסה ב-20 בדצמבר.')}
+        <label class="field"><span>מה האירוע? (למשל: יום הולדת, טיסה)</span><input id="d-label" type="text" autocomplete="off"></label>
+        <label class="field"><span>מתי האירוע?</span><input id="d-target" type="date"></label>
+        <div class="result" id="d-count" aria-live="polite" style="font-size:22px"></div>
+        <div class="note" id="d-count-date"></div>
       </div>
       <div class="card" style="margin-top:12px">
-        <div class="note" style="margin-bottom:10px">המרת תאריך</div>
+        ${head('המרת תאריך בין לועזי לעברי', 'בוחרים כיוון ומזינים תאריך, ורואים אותו בלוח השני. למשל: 3 באוקטובר 2024 הוא 1 בתשרי 5785.')}
         <div class="seg" role="radiogroup" aria-label="כיוון המרה">
           <label><input type="radio" name="dm" value="g2h" checked><span>לועזי לעברי</span></label>
           <label><input type="radio" name="dm" value="h2g"><span>עברי ללועזי</span></label>
@@ -56,7 +50,7 @@ export default {
         <div class="note">התאריך העברי מתחלף בשקיעה, והחישוב כאן לפי חצות.</div>
       </div>
       <div class="card" style="margin-top:12px">
-        <div class="note" style="margin-bottom:10px">ימים בין שני תאריכים</div>
+        ${head('כמה זמן עובר בין שני תאריכים?', 'מזינים תאריך התחלה ותאריך סיום, ורואים את ההפרש בימים, בשבועות ובחודשים. למשל: מ-3 בנובמבר עד 8 בדצמבר הם חודש ו-5 ימים.')}
         <div class="two">
           <label class="field"><span>מתאריך</span><input id="d-a" type="date"></label>
           <label class="field"><span>עד תאריך</span><input id="d-b" type="date"></label>
@@ -67,16 +61,16 @@ export default {
     const $ = (s) => container.querySelector(s);
 
     // ספירה לאחור
-    const label = $('#d-label'), target = $('#d-target'), count = $('#d-count');
+    const label = $('#d-label'), target = $('#d-target'), count = $('#d-count'), countDate = $('#d-count-date');
     const saved = store.get(KEY, { label: '', date: '' });
     label.value = saved.label;
     target.value = saved.date;
     function updateCount() {
       store.set(KEY, { label: label.value, date: target.value });
       const t = fromInput(target.value);
-      if (!t) { count.replaceChildren(); return; }
-      const n = daysBetween(today(), t);
-      showLines(count, [[label.value.trim() || 'התאריך', daysText(n)], ['תאריך', t.toLocaleDateString('he-IL', LONG)]]);
+      if (!t) { count.textContent = ''; countDate.textContent = ''; return; }
+      count.textContent = countdownText(label.value, daysBetween(today(), t));
+      countDate.textContent = t.toLocaleDateString('he-IL', LONG);
     }
     label.addEventListener('input', updateCount);
     target.addEventListener('input', updateCount);
@@ -133,8 +127,11 @@ export default {
       const x = fromInput(a.value), y = fromInput(b.value);
       if (!x || !y) { between.replaceChildren(); return; }
       const n = Math.abs(daysBetween(x, y));
-      const weeks = Math.floor(n / 7), rest = n % 7;
-      showLines(between, [['ימים', String(n)], ['שבועות וימים', `${weeks} ש' ו-${rest} י'`]]);
+      showLines(between, [
+        ['בימים', n === 1 ? 'יום אחד' : `${n} ימים`],
+        ['בשבועות', weeksAndDaysText(n)],
+        ['בחודשים ובשנים', monthsAndDaysText(x, y)],
+      ]);
     }
     a.addEventListener('input', updateBetween);
     b.addEventListener('input', updateBetween);

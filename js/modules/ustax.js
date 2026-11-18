@@ -4,7 +4,8 @@ import { formatMoney } from '../lib/num.js';
 import { store } from '../lib/store.js';
 import { loadRates, rateNote } from '../rates.js';
 import { loadTaxData } from '../taxData.js';
-import { readNum, onInput, showLines } from '../ui.js';
+import { createPicker } from '../picker.js';
+import { head, readNum, onInput, showLines } from '../ui.js';
 
 const KEY = 'ustax_last';
 const CATEGORY_LABEL = { general: 'כללי', clothing: 'בגדים ונעליים' };
@@ -18,9 +19,9 @@ export default {
   render(container) {
     container.innerHTML = `
       <div class="card">
-        <label class="field"><span>מחיר על המדף ($)</span><input id="x-price" type="text" inputmode="decimal" autocomplete="off" placeholder="0"></label>
-        <label class="field"><span>חיפוש מדינה</span><input id="x-q" type="text" autocomplete="off" placeholder="למשל ניו יורק"></label>
-        <label class="field"><span>מדינה</span><select id="x-state"></select></label>
+        ${head('כמה זה יעלה לי עם המס?', 'בארה"ב המחיר על המדף לא כולל מס מכירה, והמס מתווסף בקופה. מזינים את המחיר ומדינה, ורואים את המס ואת הסכום הסופי בדולרים ובשקלים. בחלק מהמדינות בגדים פטורים ממס, ואז יופיע כפתור "בגדים ונעליים".')}
+        <label class="field"><span>המחיר על המדף ($)</span><input id="x-price" type="text" inputmode="decimal" autocomplete="off" placeholder="למשל 49.99"></label>
+        <div id="x-state-pick"></div>
         <div id="x-cats-wrap" hidden>
           <div class="note" style="margin:0 0 6px">סוג מוצר</div>
           <div class="chips cats" id="x-cats" role="radiogroup" aria-label="סוג מוצר"></div>
@@ -34,19 +35,10 @@ export default {
       </div>`;
 
     const $ = (s) => container.querySelector(s);
-    const price = $('#x-price'), q = $('#x-q'), stateSel = $('#x-state'), catsWrap = $('#x-cats-wrap');
+    const price = $('#x-price'), catsWrap = $('#x-cats-wrap');
     const cats = $('#x-cats'), rateIn = $('#x-rate'), noteEl = $('#x-note'), res = $('#x-res'), info = $('#x-info');
     const saved = store.get(KEY, { state: 'NJ' });
-    let data = null, usd = null, category = 'general', state = saved.state;
-
-    function fillStates() {
-      const query = q.value.trim().toLowerCase();
-      const entries = Object.entries(data.rates)
-        .filter(([code, r]) => !query || r.name_he.includes(query) || code.toLowerCase().includes(query) || code === state)
-        .sort((a, b) => a[1].name_he.localeCompare(b[1].name_he, 'he'));
-      stateSel.innerHTML = entries.map(([code, r]) => `<option value="${code}"${code === state ? ' selected' : ''}>${r.name_he}</option>`).join('');
-      stateSel.value = state;
-    }
+    let data = null, usd = null, category = 'general', state = saved.state, picker = null;
 
     function fillCategories() {
       const available = categoriesFor(state, data);
@@ -86,8 +78,6 @@ export default {
     }
 
     onInput([price, rateIn], calc);
-    q.addEventListener('input', () => { fillStates(); });
-    stateSel.addEventListener('change', () => { state = stateSel.value; fillCategories(); calc(); });
     cats.addEventListener('click', (e) => {
       const b = e.target.closest('button[data-cat]');
       if (!b) return;
@@ -103,7 +93,18 @@ export default {
       data = d;
       usd = r;
       if (!data.rates[state]) state = 'NJ';
-      fillStates();
+      const items = Object.entries(data.rates)
+        .sort((a, b) => a[1].name_he.localeCompare(b[1].name_he, 'he'))
+        .map(([code, rate]) => ({ value: code, label: rate.name_he, search: code }));
+      picker = createPicker({
+        label: 'מדינה',
+        items,
+        value: state,
+        placeholder: 'חיפוש מדינה, למשל ניו יורק',
+        onChange: (code) => { state = code; fillCategories(); calc(); },
+      });
+      $('#x-state-pick').append(picker.el);
+      picker.scrollToSelected();
       fillCategories();
       info.textContent = `הערכה בלבד: המס המקומי משתנה מעיר לעיר. שיעורים נבדקו ב-${d.ratesVerifiedAt}, כללי פטור ב-${d.rulesVerifiedAt}. ${r ? rateNote(r) : 'אין שער דולר זמין, ולכן לא מוצג סכום בשקלים.'}`;
       calc();

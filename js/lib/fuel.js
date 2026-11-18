@@ -17,3 +17,8 @@ export function kmPerL(l100) {
 export function pricePerLiterIls({ pricePerGallonUsd, usdToIls }) {
   return pricePerGallonUsd * usdToIls / LITERS_PER_US_GALLON;
 }
+
+// הכיוון ההפוך: מחיר לליטר בשקלים למחיר לגלון בדולרים.
+export function pricePerGallonUsd({ pricePerLiterIls, usdToIls }) {
+  return usdToIls > 0 ? pricePerLiterIls / usdToIls * LITERS_PER_US_GALLON : NaN;
+}

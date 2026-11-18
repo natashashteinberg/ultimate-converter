@@ -1,7 +1,8 @@
 import { cupsToGrams, gramsToCups, sticksToGrams, gramsToSticks } from '../lib/kitchen.js';
 import { convert, categories } from '../lib/units.js';
 import { parseNumber } from '../lib/num.js';
-import { showLines } from '../ui.js';
+import { createPicker } from '../picker.js';
+import { head, showLines } from '../ui.js';
 
 const VOLUME_IDS = ['tsp', 'tbsp', 'cup', 'fl_oz', 'ml', 'l'];
 const OVEN_F = [250, 275, 300, 325, 350, 375, 400, 425, 450];
@@ -16,29 +17,29 @@ export default {
     const opts = (sel) => VOLUME_IDS.map((id) => `<option value="${id}"${id === sel ? ' selected' : ''}>${categories.volume.units[id].label}</option>`).join('');
     container.innerHTML = `
       <div class="card">
-        <div class="note" style="margin-bottom:10px">נפחים</div>
-        <label class="field"><span>כמות</span><input id="k-amt" type="text" inputmode="decimal" autocomplete="off" placeholder="1"></label>
+        ${head('המרת נפחים', 'בין כפיות, כפות, כוסות, אונקיות נוזל, מיליליטרים וליטרים. למשל: כוס אחת (אמריקאית) היא כ-237 מ"ל.')}
+        <label class="field"><span>הכמות</span><input id="k-amt" type="text" inputmode="decimal" autocomplete="off" placeholder="למשל 1"></label>
         <div class="two">
           <label class="field"><span>מ-</span><select id="k-from">${opts('cup')}</select></label>
           <label class="field"><span>ל-</span><select id="k-to">${opts('ml')}</select></label>
         </div>
         <div class="result" id="k-res" aria-live="polite"></div>
       </div>
-      <div class="card" style="margin-top:12px">
-        <div class="note" style="margin-bottom:10px">כוסות וגרמים לפי חומר</div>
-        <label class="field"><span>חומר</span><select id="g-ing"></select></label>
+      <div class="card">
+        ${head('כוסות וגרמים לפי חומר', 'מתכונים אמריקאיים מודדים בכוסות, אבל כוס קמח וכוס סוכר שוקלות משקל שונה. בוחרים חומר, ומקלידים כוסות או גרמים (או מקלות חמאה). למשל: כוס קמח רגיל היא 120 גרם.')}
+        <div id="g-pick"></div>
         <div class="two">
-          <label class="field"><span>כוסות</span><input id="g-cups" type="text" inputmode="decimal" autocomplete="off"></label>
-          <label class="field"><span>גרמים</span><input id="g-grams" type="text" inputmode="decimal" autocomplete="off"></label>
+          <label class="field"><span>כוסות</span><input id="g-cups" type="text" inputmode="decimal" autocomplete="off" placeholder="למשל 2"></label>
+          <label class="field"><span>גרמים</span><input id="g-grams" type="text" inputmode="decimal" autocomplete="off" placeholder="למשל 240"></label>
         </div>
-        <label class="field" id="g-stick-wrap" hidden><span>מקלות חמאה</span><input id="g-sticks" type="text" inputmode="decimal" autocomplete="off"></label>
+        <label class="field" id="g-stick-wrap" hidden><span>מקלות חמאה</span><input id="g-sticks" type="text" inputmode="decimal" autocomplete="off" placeholder="למשל 2"></label>
         <div class="note" id="g-note"></div>
       </div>
-      <div class="card" style="margin-top:12px">
-        <div class="note" style="margin-bottom:10px">טמפרטורת תנור</div>
+      <div class="card">
+        ${head('טמפרטורת תנור', 'מתכונים אמריקאיים נותנים טמפרטורה בפרנהייט. מקלידים באחד הצדדים והשני מתעדכן. למשל: 350°F הם 177°C. מתחת יש טבלה של הטמפרטורות הנפוצות.')}
         <div class="two">
-          <label class="field"><span>פרנהייט</span><input id="o-f" type="text" inputmode="decimal" autocomplete="off" placeholder="350"></label>
-          <label class="field"><span>צלזיוס</span><input id="o-c" type="text" inputmode="decimal" autocomplete="off"></label>
+          <label class="field"><span>פרנהייט</span><input id="o-f" type="text" inputmode="decimal" autocomplete="off" placeholder="למשל 350"></label>
+          <label class="field"><span>צלזיוס</span><input id="o-c" type="text" inputmode="decimal" autocomplete="off" placeholder="למשל 180"></label>
         </div>
         <div class="lines" id="o-table"></div>
       </div>`;
@@ -51,7 +52,6 @@ export default {
       const v = parseNumber(amt.value);
       if (v === null || v < 0) { res.replaceChildren(); return; }
       const bdi = document.createElement('bdi');
-      bdi.dir = 'ltr';
       bdi.textContent = n(convert('volume', v, from.value, to.value), 4);
       res.replaceChildren(bdi, ' ', categories.volume.units[to.value].label);
     }
@@ -60,18 +60,18 @@ export default {
     to.addEventListener('change', volume);
 
     // חומרים
-    const ing = $('#g-ing'), cups = $('#g-cups'), grams = $('#g-grams'), sticks = $('#g-sticks'), stickWrap = $('#g-stick-wrap');
-    let data = null;
-    const syncSticks = () => { stickWrap.hidden = ing.value !== 'butter'; };
+    const cups = $('#g-cups'), grams = $('#g-grams'), sticks = $('#g-sticks'), stickWrap = $('#g-stick-wrap');
+    let data = null, ingId = null;
+    const syncSticks = () => { stickWrap.hidden = ingId !== 'butter'; };
     function fromCups() {
       const v = parseNumber(cups.value);
-      const g = v === null ? NaN : cupsToGrams(ing.value, v, data);
+      const g = v === null ? NaN : cupsToGrams(ingId, v, data);
       grams.value = n(g, 1);
       sticks.value = n(gramsToSticks(g, data), 2);
     }
     function fromGrams() {
       const v = parseNumber(grams.value);
-      const c = v === null ? NaN : gramsToCups(ing.value, v, data);
+      const c = v === null ? NaN : gramsToCups(ingId, v, data);
       cups.value = n(c, 3);
       sticks.value = n(gramsToSticks(v ?? NaN, data), 2);
     }
@@ -79,12 +79,11 @@ export default {
       const v = parseNumber(sticks.value);
       const g = v === null ? NaN : sticksToGrams(v, data);
       grams.value = n(g, 1);
-      cups.value = n(gramsToCups(ing.value, g, data), 3);
+      cups.value = n(gramsToCups(ingId, g, data), 3);
     }
     cups.addEventListener('input', () => data && fromCups());
     grams.addEventListener('input', () => data && fromGrams());
     sticks.addEventListener('input', () => data && fromSticks());
-    ing.addEventListener('change', () => { syncSticks(); if (data) fromCups(); });
 
     // תנור
     const of = $('#o-f'), oc = $('#o-c');
@@ -100,7 +99,15 @@ export default {
 
     fetch('data/cooking.json').then((r) => r.json()).then((d) => {
       data = d;
-      ing.innerHTML = d.ingredients.map((i) => `<option value="${i.id}">${i.he}</option>`).join('');
+      ingId = d.ingredients[0].id;
+      const picker = createPicker({
+        label: 'בוחרים חומר',
+        items: d.ingredients.map((i) => ({ value: i.id, label: i.he })),
+        value: ingId,
+        placeholder: 'חיפוש חומר, למשל קמח',
+        onChange: (id) => { ingId = id; syncSticks(); fromCups(); },
+      });
+      $('#g-pick').append(picker.el);
       $('#g-note').textContent = `${d.note_he} מקל חמאה אמריקאי הוא ${d.butterStickG} גרם. נבדק ב-${d.verifiedAt}. מקור: King Arthur Baking.`;
       syncSticks();
     }).catch(() => { $('#g-note').textContent = 'טבלת החומרים אינה זמינה כרגע.'; });

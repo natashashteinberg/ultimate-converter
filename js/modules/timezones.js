@@ -1,9 +1,16 @@
 import { convertTime, wallTime } from '../lib/timezones.js';
 import { store } from '../lib/store.js';
-import { bdi } from '../ui.js';
+import { createPicker } from '../picker.js';
+import { head, bdi } from '../ui.js';
 
-const KEY = 'tz_state';
-const DEFAULT_LIST = ['new_york', 'los_angeles', 'london'];
+const KEY = 'tz_state2';
+const DEFAULT_LIST = ['london', 'paris', 'tokyo'];
+
+function dayLabel(r) {
+  const [, m, d] = r.date.split('-');
+  const word = r.dayOffset < 0 ? 'אתמול' : r.dayOffset > 0 ? 'מחר' : 'אותו יום';
+  return `${word}, ${Number(d)}/${Number(m)}`;
+}
 
 export default {
   id: 'timezones',
@@ -13,55 +20,75 @@ export default {
   render(container) {
     container.innerHTML = `
       <div class="card">
-        <label class="field"><span>עיר מקור</span><select id="z-base"></select></label>
+        ${head('איזו שעה זו בעיר אחרת?', 'בוחרים עיר מקור ועיר יעד, ושעה בעיר המקור, ורואים מה השעה באותו רגע בעיר היעד. אם משנים את השעה, כפתור "חזרה להווה" מחזיר לשעה הנוכחית. שעון קיץ מחושב אוטומטית.')}
+        <div id="z-from-pick"></div>
+        <div id="z-to-pick"></div>
         <div class="two">
-          <label class="field"><span>תאריך</span><input id="z-date" type="date"></label>
-          <label class="field"><span>שעה</span><input id="z-time" type="time"></label>
+          <label class="field"><span>תאריך בעיר המקור</span><input id="z-date" type="date"></label>
+          <label class="field"><span>שעה בעיר המקור</span><input id="z-time" type="time"></label>
         </div>
-        <button class="add" id="z-now" type="button" style="margin-top:0">עכשיו</button>
+        <button class="add" id="z-now" type="button" style="margin-top:0">חזרה להווה</button>
+        <div class="result" id="z-main" aria-live="polite" style="margin-top:14px"></div>
+        <div class="note" id="z-main-day"></div>
       </div>
-      <div class="card" style="margin-top:12px">
+      <div class="card">
+        ${head('עוד ערים', 'רשימה של ערים עם השעה בכל אחת, לאותו רגע בעיר המקור. אפשר להוסיף עיר (עם חיפוש) ולהסיר עיר עם הכפתור ×.')}
         <div id="z-list"></div>
         <div class="note" id="z-empty" hidden>הוסיפי עיר כדי לראות את השעה בה.</div>
-      </div>
-      <div class="card" style="margin-top:12px">
-        <label class="field"><span>חיפוש עיר להוספה</span><input id="z-q" type="text" autocomplete="off" placeholder="למשל מיאמי או Tokyo"></label>
-        <label class="field"><span>עיר</span><select id="z-add"></select></label>
+        <div id="z-add-pick" style="margin-top:14px"></div>
         <button class="add" id="z-addbtn" type="button" style="margin-top:0">הוסף עיר</button>
-      </div>
-      <div class="note" style="margin-top:10px">שעון קיץ מחושב אוטומטית לפי התאריך שנבחר.</div>`;
+      </div>`;
 
     const $ = (s) => container.querySelector(s);
-    const base = $('#z-base'), dateIn = $('#z-date'), timeIn = $('#z-time'), list = $('#z-list'), empty = $('#z-empty');
-    const q = $('#z-q'), addSel = $('#z-add');
-    const saved = store.get(KEY, { base: 'jerusalem', list: DEFAULT_LIST });
-    let cities = [], byId = new Map(), chosen = Array.isArray(saved.list) ? saved.list : DEFAULT_LIST;
+    const dateIn = $('#z-date'), timeIn = $('#z-time'), list = $('#z-list'), empty = $('#z-empty');
+    const nowBtn = $('#z-now'), mainOut = $('#z-main'), mainDay = $('#z-main-day');
+    const saved = store.get(KEY, { from: 'jerusalem', to: 'new_york', list: DEFAULT_LIST });
+    let cities = [], byId = new Map();
+    let fromId = saved.from, toId = saved.to, chosen = Array.isArray(saved.list) ? saved.list : DEFAULT_LIST;
+    let live = true, fromPicker = null, toPicker = null, addPicker = null;
     const outs = new Map();
 
+    const tzOf = (id) => byId.get(id).tz;
+    const nowWall = () => wallTime(tzOf(fromId), new Date());
+
+    function refreshNowButton() {
+      const w = nowWall();
+      nowBtn.disabled = dateIn.value === w.date && timeIn.value === w.time;
+    }
+
     function setNow() {
-      const city = byId.get(base.value);
-      const w = wallTime(city.tz, new Date());
+      const w = nowWall();
       dateIn.value = w.date;
       timeIn.value = w.time;
+      live = true;
       update();
     }
 
-    function persist() { store.set(KEY, { base: base.value, list: chosen }); }
-
     function update() {
-      persist();
-      const from = byId.get(base.value);
+      store.set(KEY, { from: fromId, to: toId, list: chosen });
+      const base = { fromTz: tzOf(fromId), date: dateIn.value, time: timeIn.value };
+      const main = convertTime({ ...base, toTz: tzOf(toId) });
+      mainOut.replaceChildren();
+      mainDay.textContent = '';
+      if (main) {
+        mainOut.append(`ב${byId.get(toId).he}: `, bdi(main.time));
+        mainDay.textContent = dayLabel(main);
+      }
       for (const [id, o] of outs) {
-        const to = byId.get(id);
-        const r = convertTime({ fromTz: from.tz, toTz: to.tz, date: dateIn.value, time: timeIn.value });
+        const r = convertTime({ ...base, toTz: tzOf(id) });
         o.time.replaceChildren();
         o.day.textContent = '';
         if (!r) continue;
         o.time.append(bdi(r.time));
-        const [, m, d] = r.date.split('-');
-        const label = r.dayOffset < 0 ? 'אתמול' : r.dayOffset > 0 ? 'מחר' : 'אותו יום';
-        o.day.textContent = `${label}, ${Number(d)}/${Number(m)}`;
+        o.day.textContent = dayLabel(r);
       }
+      refreshNowButton();
+    }
+
+    function addItems() {
+      return cities
+        .filter((c) => !chosen.includes(c.id))
+        .map((c) => ({ value: c.id, label: `${c.he} · ${c.en}`, search: c.en }));
     }
 
     function renderList() {
@@ -81,7 +108,12 @@ export default {
         del.className = 'tz-del';
         del.setAttribute('aria-label', `הסרת ${byId.get(id).he}`);
         del.textContent = '×';
-        del.addEventListener('click', () => { chosen = chosen.filter((x) => x !== id); renderList(); update(); });
+        del.addEventListener('click', () => {
+          chosen = chosen.filter((x) => x !== id);
+          renderList();
+          addPicker?.setItems(addItems());
+          update();
+        });
         const mid = document.createElement('div');
         mid.append(name, day);
         row.append(mid, time, del);
@@ -91,34 +123,51 @@ export default {
       empty.hidden = outs.size > 0;
     }
 
-    function fillAdd() {
-      const query = q.value.trim().toLowerCase();
-      addSel.innerHTML = cities
-        .filter((c) => !chosen.includes(c.id) && (!query || c.he.includes(query) || c.en.toLowerCase().includes(query)))
-        .map((c) => `<option value="${c.id}">${c.he} · ${c.en}</option>`).join('');
-    }
-
-    base.addEventListener('change', update);
-    dateIn.addEventListener('input', update);
-    timeIn.addEventListener('input', update);
-    $('#z-now').addEventListener('click', setNow);
-    q.addEventListener('input', fillAdd);
+    function userEdited() { live = false; update(); }
+    dateIn.addEventListener('input', userEdited);
+    timeIn.addEventListener('input', userEdited);
+    nowBtn.addEventListener('click', setNow);
     $('#z-addbtn').addEventListener('click', () => {
-      if (!addSel.value) return;
-      chosen = [...chosen, addSel.value];
-      q.value = '';
+      const id = addPicker?.value;
+      if (!id || chosen.includes(id)) return;
+      chosen = [...chosen, id];
       renderList();
-      fillAdd();
+      addPicker.setItems(addItems());
+      addPicker.setValue(undefined);
       update();
     });
+
+    // כשהשעה היא שעת ההווה, היא ממשיכה להתקדם. אחרת רק מתעדכן מצב הכפתור.
+    const timer = setInterval(() => {
+      if (!container.isConnected) { clearInterval(timer); return; }
+      if (cities.length === 0) return;
+      if (live) setNow(); else refreshNowButton();
+    }, 15000);
 
     fetch('data/cities.json').then((r) => r.json()).then((data) => {
       cities = data;
       byId = new Map(data.map((c) => [c.id, c]));
-      base.innerHTML = data.map((c) => `<option value="${c.id}">${c.he}</option>`).join('');
-      base.value = byId.has(saved.base) ? saved.base : 'jerusalem';
+      if (!byId.has(fromId)) fromId = 'jerusalem';
+      if (!byId.has(toId)) toId = 'new_york';
+      const items = data.map((c) => ({ value: c.id, label: `${c.he} · ${c.en}`, search: c.en }));
+      fromPicker = createPicker({
+        label: 'עיר המקור', items, value: fromId, placeholder: 'חיפוש עיר',
+        onChange: (id) => { fromId = id; if (live) setNow(); else update(); },
+      });
+      toPicker = createPicker({
+        label: 'עיר היעד', items, value: toId, placeholder: 'חיפוש עיר',
+        onChange: (id) => { toId = id; update(); },
+      });
+      $('#z-from-pick').append(fromPicker.el);
+      $('#z-to-pick').append(toPicker.el);
+      fromPicker.scrollToSelected();
+      toPicker.scrollToSelected();
       renderList();
-      fillAdd();
+      addPicker = createPicker({
+        label: 'הוספת עיר לרשימה', items: addItems(), value: undefined, emptyLabel: 'בחרי עיר מהרשימה',
+        placeholder: 'חיפוש עיר, למשל מיאמי או Tokyo',
+      });
+      $('#z-add-pick').append(addPicker.el);
       setNow();
     }).catch(() => { list.textContent = 'רשימת הערים אינה זמינה כרגע.'; });
   },

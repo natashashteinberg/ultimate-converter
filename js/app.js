@@ -90,9 +90,11 @@ if (canRegister) {
       });
     });
   }).catch(() => { /* האפליקציה עובדת גם בלי service worker */ });
+  // בביקור הראשון ה-service worker רק משתלט על העמוד, ואין סיבה לרענן. מרעננים רק בעדכון, כשכבר היה שליטה.
+  const hadController = Boolean(navigator.serviceWorker.controller);
   let reloaded = false;
   navigator.serviceWorker.addEventListener('controllerchange', () => {
-    if (reloaded) return;
+    if (!hadController || reloaded) return;
     reloaded = true;
     location.reload();
   });
