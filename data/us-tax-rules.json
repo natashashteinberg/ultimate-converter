@@ -1,0 +1,72 @@
+{
+ "verifiedAt": "2026-11-18",
+ "scope_he": "כרגע רק בגדים ונעליים. מצרכים ותרופות עדיין לא נכללים.",
+ "rules": {
+  "NJ": [
+   {
+    "category": "clothing",
+    "type": "exempt",
+    "note_he": "בניו ג'רזי בגדים ונעליים פטורים ממס. אביזרים (תיקים, תכשיטים, שעונים), פרוות וציוד ספורט חייבים.",
+    "source": "https://www.nj.gov/treasury/taxation/pdf/pubs/sales/su4.pdf",
+    "verifiedAt": "2026-11-18"
+   }
+  ],
+  "PA": [
+   {
+    "category": "clothing",
+    "type": "exempt",
+    "note_he": "בפנסילבניה בגדי יום-יום פטורים ממס. בגדי ערב ופורמליים, פרוות, אביזרים וציוד ספורט חייבים.",
+    "source": "https://www.pa.gov/agencies/revenue/resources/tax-types-and-information/sales-use-and-hotel-occupancy-tax",
+    "verifiedAt": "2026-11-18"
+   }
+  ],
+  "MN": [
+   {
+    "category": "clothing",
+    "type": "exempt",
+    "note_he": "במינסוטה בגדים לשימוש כללי פטורים ממס. אביזרים, פרוות וציוד מגן חייבים.",
+    "source": "https://www.revenue.state.mn.us/clothing",
+    "verifiedAt": "2026-11-18"
+   }
+  ],
+  "VT": [
+   {
+    "category": "clothing",
+    "type": "exempt",
+    "note_he": "בורמונט בגדים לשימוש כללי פטורים ממס. אביזרים, ציוד מגן וציוד ספורט חייבים.",
+    "source": "https://tax.vermont.gov/exempt-items",
+    "verifiedAt": "2026-11-18"
+   }
+  ],
+  "RI": [
+   {
+    "category": "clothing",
+    "type": "first_amount",
+    "note_he": "ברוד איילנד בגדים ונעליים פטורים עד 250$ לפריט. מעל זה משלמים מס רק על העודף מעל 250$.",
+    "source": "https://rules.sos.ri.gov/regulations/part/280-20-70-6",
+    "verifiedAt": "2026-11-18",
+    "amount": 250
+   }
+  ],
+  "NY": [
+   {
+    "category": "clothing",
+    "type": "below_threshold",
+    "note_he": "בניו יורק בגדים ונעליים מתחת ל-110$ לפריט פטורים ממס המדינה, ובעיר ניו יורק גם ממס העירייה. במחוזות אחרים ייתכן שנשאר מס מקומי. מ-110$ ומעלה משלמים מס על כל המחיר.",
+    "source": "https://www.tax.ny.gov/pubs_and_bulls/tg_bulletins/st/clothing_and_footwear.htm",
+    "verifiedAt": "2026-11-18",
+    "threshold": 110
+   }
+  ],
+  "MA": [
+   {
+    "category": "clothing",
+    "type": "first_amount",
+    "note_he": "במסצ'וסטס בגדים ונעליים פטורים עד 175$ לפריט. מעל זה משלמים מס רק על העודף מעל 175$. ביגוד ספורט והגנה מיוחד חייב.",
+    "source": "https://www.mass.gov/guides/sales-and-use-tax",
+    "verifiedAt": "2026-11-18",
+    "amount": 175
+   }
+  ]
+ }
+}

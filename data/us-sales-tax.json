@@ -1,0 +1,263 @@
+{
+ "verifiedAt": "2026-11-18",
+ "source": "https://taxfoundation.org/data/all/state/2026-sales-tax-rates-midyear/",
+ "asOf": "2026-07-01",
+ "note_he": "שיעור משולב: מס המדינה בתוספת ממוצע מקומי משוקלל. המס המקומי בפועל משתנה מעיר לעיר.",
+ "rates": {
+  "AK": {
+   "name_he": "אלסקה",
+   "statePct": 0.0,
+   "combinedPct": 1.82
+  },
+  "AL": {
+   "name_he": "אלבמה",
+   "statePct": 4.0,
+   "combinedPct": 9.46
+  },
+  "AR": {
+   "name_he": "ארקנסו",
+   "statePct": 6.5,
+   "combinedPct": 9.48
+  },
+  "AZ": {
+   "name_he": "אריזונה",
+   "statePct": 5.6,
+   "combinedPct": 8.54
+  },
+  "CA": {
+   "name_he": "קליפורניה",
+   "statePct": 7.25,
+   "combinedPct": 9.03
+  },
+  "CO": {
+   "name_he": "קולורדו",
+   "statePct": 2.9,
+   "combinedPct": 7.89
+  },
+  "CT": {
+   "name_he": "קונטיקט",
+   "statePct": 6.35,
+   "combinedPct": 6.35
+  },
+  "DC": {
+   "name_he": "וושינגטון די.סי.",
+   "statePct": 6.0,
+   "combinedPct": 6.0
+  },
+  "DE": {
+   "name_he": "דלאוור",
+   "statePct": 0.0,
+   "combinedPct": 0.0
+  },
+  "FL": {
+   "name_he": "פלורידה",
+   "statePct": 6.0,
+   "combinedPct": 6.98
+  },
+  "GA": {
+   "name_he": "ג'ורג'יה",
+   "statePct": 4.0,
+   "combinedPct": 7.56
+  },
+  "HI": {
+   "name_he": "הוואי",
+   "statePct": 4.0,
+   "combinedPct": 4.5
+  },
+  "IA": {
+   "name_he": "איווה",
+   "statePct": 6.0,
+   "combinedPct": 6.94
+  },
+  "ID": {
+   "name_he": "איידהו",
+   "statePct": 6.0,
+   "combinedPct": 6.03
+  },
+  "IL": {
+   "name_he": "אילינוי",
+   "statePct": 6.25,
+   "combinedPct": 8.98
+  },
+  "IN": {
+   "name_he": "אינדיאנה",
+   "statePct": 7.0,
+   "combinedPct": 7.0
+  },
+  "KS": {
+   "name_he": "קנזס",
+   "statePct": 6.5,
+   "combinedPct": 8.71
+  },
+  "KY": {
+   "name_he": "קנטקי",
+   "statePct": 6.0,
+   "combinedPct": 6.0
+  },
+  "LA": {
+   "name_he": "לואיזיאנה",
+   "statePct": 5.0,
+   "combinedPct": 10.13
+  },
+  "MA": {
+   "name_he": "מסצ'וסטס",
+   "statePct": 6.25,
+   "combinedPct": 6.25
+  },
+  "MD": {
+   "name_he": "מרילנד",
+   "statePct": 6.0,
+   "combinedPct": 6.0
+  },
+  "ME": {
+   "name_he": "מיין",
+   "statePct": 5.5,
+   "combinedPct": 5.5
+  },
+  "MI": {
+   "name_he": "מישיגן",
+   "statePct": 6.0,
+   "combinedPct": 6.0
+  },
+  "MN": {
+   "name_he": "מינסוטה",
+   "statePct": 6.88,
+   "combinedPct": 8.14
+  },
+  "MO": {
+   "name_he": "מיזורי",
+   "statePct": 4.23,
+   "combinedPct": 8.44
+  },
+  "MS": {
+   "name_he": "מיסיסיפי",
+   "statePct": 7.0,
+   "combinedPct": 7.06
+  },
+  "MT": {
+   "name_he": "מונטנה",
+   "statePct": 0.0,
+   "combinedPct": 0.0
+  },
+  "NC": {
+   "name_he": "צפון קרוליינה",
+   "statePct": 4.75,
+   "combinedPct": 7.1
+  },
+  "ND": {
+   "name_he": "צפון דקוטה",
+   "statePct": 5.0,
+   "combinedPct": 7.09
+  },
+  "NE": {
+   "name_he": "נברסקה",
+   "statePct": 5.5,
+   "combinedPct": 6.98
+  },
+  "NH": {
+   "name_he": "ניו המפשייר",
+   "statePct": 0.0,
+   "combinedPct": 0.0
+  },
+  "NJ": {
+   "name_he": "ניו ג'רזי",
+   "statePct": 6.63,
+   "combinedPct": 6.6
+  },
+  "NM": {
+   "name_he": "ניו מקסיקו",
+   "statePct": 4.88,
+   "combinedPct": 7.68
+  },
+  "NV": {
+   "name_he": "נבדה",
+   "statePct": 6.85,
+   "combinedPct": 8.24
+  },
+  "NY": {
+   "name_he": "ניו יורק",
+   "statePct": 4.0,
+   "combinedPct": 8.54
+  },
+  "OH": {
+   "name_he": "אוהיו",
+   "statePct": 5.75,
+   "combinedPct": 7.29
+  },
+  "OK": {
+   "name_he": "אוקלהומה",
+   "statePct": 4.5,
+   "combinedPct": 9.06
+  },
+  "OR": {
+   "name_he": "אורגון",
+   "statePct": 0.0,
+   "combinedPct": 0.0
+  },
+  "PA": {
+   "name_he": "פנסילבניה",
+   "statePct": 6.0,
+   "combinedPct": 6.34
+  },
+  "RI": {
+   "name_he": "רוד איילנד",
+   "statePct": 7.0,
+   "combinedPct": 7.0
+  },
+  "SC": {
+   "name_he": "דרום קרוליינה",
+   "statePct": 6.0,
+   "combinedPct": 7.49
+  },
+  "SD": {
+   "name_he": "דרום דקוטה",
+   "statePct": 4.2,
+   "combinedPct": 6.11
+  },
+  "TN": {
+   "name_he": "טנסי",
+   "statePct": 7.0,
+   "combinedPct": 9.61
+  },
+  "TX": {
+   "name_he": "טקסס",
+   "statePct": 6.25,
+   "combinedPct": 8.2
+  },
+  "UT": {
+   "name_he": "יוטה",
+   "statePct": 6.1,
+   "combinedPct": 7.42
+  },
+  "VA": {
+   "name_he": "וירג'יניה",
+   "statePct": 5.3,
+   "combinedPct": 5.77
+  },
+  "VT": {
+   "name_he": "ורמונט",
+   "statePct": 6.0,
+   "combinedPct": 6.43
+  },
+  "WA": {
+   "name_he": "וושינגטון",
+   "statePct": 6.5,
+   "combinedPct": 9.57
+  },
+  "WI": {
+   "name_he": "ויסקונסין",
+   "statePct": 5.0,
+   "combinedPct": 5.72
+  },
+  "WV": {
+   "name_he": "מערב וירג'יניה",
+   "statePct": 6.0,
+   "combinedPct": 6.6
+  },
+  "WY": {
+   "name_he": "וויומינג",
+   "statePct": 4.0,
+   "combinedPct": 5.39
+  }
+ }
+}

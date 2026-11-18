@@ -1,0 +1,26 @@
+{
+  "verifiedAt": "2026-11-18",
+  "sources": [
+    "https://www.kingarthurbaking.com/learn/ingredient-weight-chart"
+  ],
+  "note_he": "משקלים בגרמים לכוס אמריקאית (236.6 מ\"ל). זה בקירוב: אופן המדידה (דחוס או מנופה) משנה את התוצאה. ערכים של חומרים שהמקור נותן לכמות קטנה יותר (קקאו, אורז, עמילן תירס, דבש) חושבו לכוס שלמה.",
+  "cupMl": 236.588,
+  "butterStickG": 113,
+  "ingredients": [
+    { "id": "all_purpose_flour", "he": "קמח רגיל", "gramsPerCup": 120 },
+    { "id": "bread_flour", "he": "קמח לחם", "gramsPerCup": 120 },
+    { "id": "whole_wheat_flour", "he": "קמח מלא", "gramsPerCup": 113 },
+    { "id": "sugar", "he": "סוכר לבן", "gramsPerCup": 198 },
+    { "id": "brown_sugar", "he": "סוכר חום (דחוס)", "gramsPerCup": 213 },
+    { "id": "powdered_sugar", "he": "אבקת סוכר", "gramsPerCup": 113 },
+    { "id": "butter", "he": "חמאה", "gramsPerCup": 226 },
+    { "id": "oil", "he": "שמן צמחי", "gramsPerCup": 198 },
+    { "id": "milk", "he": "חלב", "gramsPerCup": 227 },
+    { "id": "water", "he": "מים", "gramsPerCup": 227 },
+    { "id": "honey", "he": "דבש", "gramsPerCup": 336 },
+    { "id": "cocoa", "he": "קקאו (לא ממותק)", "gramsPerCup": 84 },
+    { "id": "oats", "he": "שיבולת שועל (רגילה או מהירה)", "gramsPerCup": 89 },
+    { "id": "rice", "he": "אורז (גולמי)", "gramsPerCup": 198 },
+    { "id": "cornstarch", "he": "עמילן תירס", "gramsPerCup": 112 }
+  ]
+}
